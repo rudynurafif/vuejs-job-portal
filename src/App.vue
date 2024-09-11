@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const name = ref('John Doe');
 const status = ref('active');
@@ -18,6 +18,20 @@ const addTask = () => {
     newTask.value = '';
   }
 };
+
+const deleteTask = (index) => {
+  tasks.value.splice(index, 1)
+}
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/todos')
+    const data = await response.json()
+    tasks.value = data.map((task) => task.title)
+  } catch (error) {
+    console.log('Error fetching tasks')
+  }
+})
 </script>
 
 <template>
@@ -42,7 +56,10 @@ const addTask = () => {
   <h3>Task:</h3>
   <br />
   <ul>
-    <li v-for="task in tasks" :key="task">{{ task }}</li>
+    <li v-for="(task, index) in tasks" :key="task">
+      <span>{{ task }}</span>
+      <button @click="deleteTask(index)">x</button>
+    </li>
   </ul>
 
   <br />
